@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Model extends ChangeNotifier {
   var one = 0;
@@ -15,37 +16,14 @@ class Model extends ChangeNotifier {
   }
 }
 
-class ModelProvider extends InheritedNotifier {
-  final Model model;
-  const ModelProvider({Key? key, required this.model, required Widget child})
-      : super(key: key, notifier: model, child: child);
-
-  static ModelProvider? watch(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<ModelProvider>();
-  }
-
-  static ModelProvider? read(BuildContext context) {
-    final widget = context
-        .getElementForInheritedWidgetOfExactType<ModelProvider>()
-        ?.widget;
-
-    return widget is ModelProvider ? widget : null;
-  }
-}
-
-class ExampleWidget extends StatefulWidget {
+class ExampleWidget extends StatelessWidget {
   const ExampleWidget({super.key});
 
   @override
-  State<ExampleWidget> createState() => _ExampleWidgetState();
-}
-
-class _ExampleWidgetState extends State<ExampleWidget> {
-  final model = Model();
-
-  @override
-  Widget build(BuildContext context) =>
-      ModelProvider(model: model, child: _View());
+  Widget build(BuildContext context) => ChangeNotifierProvider(
+        create: (context) => Model(),
+        child: const _View(),
+      );
 }
 
 class _View extends StatelessWidget {
@@ -53,14 +31,14 @@ class _View extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = ModelProvider.read(context)?.model;
+    final model = context.read<Model>();
 
     return Scaffold(
       body: SafeArea(
           child: Column(
         children: [
-          ElevatedButton(onPressed: model?.inc1, child: Text('one')),
-          ElevatedButton(onPressed: model?.inc2, child: Text('two')),
+          ElevatedButton(onPressed: model.inc1, child: Text('one')),
+          ElevatedButton(onPressed: model.inc2, child: Text('two')),
           ElevatedButton(onPressed: () {}, child: Text('complex')),
           _OneWidget(),
           _TwoWidget(),
@@ -77,7 +55,8 @@ class _OneWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = ModelProvider.watch(context)!.model.one;
+    final value = context.watch<Model>().one;
+
     return Text('$value');
   }
 }
@@ -87,7 +66,8 @@ class _TwoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = ModelProvider.watch(context)!.model.two;
+    final value = context.watch<Model>().two;
+
     return Text('$value');
   }
 }

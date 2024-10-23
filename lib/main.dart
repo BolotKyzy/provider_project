@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider_project/inherit_example.dart';
+import 'package:provider_project/provider_example.dart';
 
 void main() {
   runApp(const MyApp());
